@@ -1,17 +1,10 @@
-import { ROTAS } from '../constantes/rotas'
-
 class CadastroProdutoPagina {
   seletores = {
     nome: '[data-testid="nome"]',
     preco: '[data-testid="preco"]',
     descricao: '[data-testid="descricao"]',
     quantidade: '[data-testid="quantity"]',
-    imagem: '[data-testid="imagem"]',
     botaoCadastrar: '[data-testid="cadastarProdutos"]',
-  }
-
-  visitar() {
-    cy.visit(ROTAS.cadastroProduto)
   }
 
   cadastrar({ nome, preco, descricao, quantidade }) {

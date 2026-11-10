@@ -15,7 +15,3 @@ export function gerarUsuario(sobrescritas = {}) {
     ...sobrescritas,
   }
 }
-
-export function gerarUsuarioComum(sobrescritas = {}) {
-  return gerarUsuario({ administrador: 'false', ...sobrescritas })
-}
