@@ -119,6 +119,7 @@ O ID interno continua valendo mesmo que a ferramenta de gestão mude.
 - **Dado** um usuário cadastrado
 - **Quando** envio `POST /usuarios` com o mesmo e-mail
 - **Então** recebo status 400 e a mensagem "Este email já está sendo usado"
+- **E** continua existindo apenas um usuário com esse e-mail
 
 **API-USU-03 a API-USU-06 - Cadastro com campo inválido**
 
@@ -153,17 +154,20 @@ O ID interno continua valendo mesmo que a ferramenta de gestão mude.
 - **Dado** um administrador autenticado e um produto já cadastrado
 - **Quando** envio `POST /produtos` com o mesmo nome
 - **Então** recebo status 400 e a mensagem "Já existe produto com esse nome"
+- **E** continua existindo apenas um produto com esse nome
 
 **API-PRO-03 - Cadastro de produto sem token de acesso**
 
 - **Quando** envio `POST /produtos` sem o cabeçalho `Authorization`
 - **Então** recebo status 401 e a mensagem "Token de acesso ausente, inválido, expirado ou usuário do token não existe mais"
+- **E** o produto não é criado
 
 **API-PRO-04 - Cadastro de produto por usuário não administrador**
 
 - **Dado** um usuário comum autenticado
 - **Quando** envio `POST /produtos` com o token dele
 - **Então** recebo status 403 e a mensagem "Rota exclusiva para administradores"
+- **E** o produto não é criado
 
 ### E2E - Login (`cypress/e2e/ui/login.cy.js`)
 
@@ -221,7 +225,7 @@ O ID interno continua valendo mesmo que a ferramenta de gestão mude.
 
 - **Dado** um administrador autenticado na tela de cadastro de produtos
 - **Quando** preencho nome, preço, descrição e quantidade e clico em "Cadastrar"
-- **Então** a API responde 201, sou levado para `/admin/listarprodutos` e o produto aparece na listagem com nome, preço, descrição e quantidade
+- **Então** a API responde 201, sou levado para `/admin/listarprodutos` e o produto aparece na listagem com nome, preço, descrição e quantidade, cada um conferido na sua coluna
 
 **E2E-PRO-02 - Cadastro de produto com nome já utilizado**
 
@@ -231,4 +235,4 @@ O ID interno continua valendo mesmo que a ferramenta de gestão mude.
 
 ## Massa de dados e limpeza
 
-Todos os casos criam a própria massa (usuários e produtos) pela API, com dados gerados pelo Faker, e removem tudo ao final, mesmo em caso de falha. Nenhum caso depende de dados pré-existentes nem da ordem de execução.
+Todos os casos criam a própria massa (usuários e produtos) pela API, com dados gerados pelo Faker, e removem tudo ao final, mesmo em caso de falha. Os cadastros feitos pela interface são registrados para limpeza pela resposta interceptada. Se uma exclusão falhar, um aviso aparece no terminal. Nenhum caso depende de dados pré-existentes nem da ordem de execução.

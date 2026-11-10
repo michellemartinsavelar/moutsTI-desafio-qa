@@ -173,7 +173,7 @@ Para incluir uma funcionalidade nova, o caminho é sempre o mesmo: um serviço e
 
 - **Dinâmica e isolada**: todo usuário e produto é gerado pelo Faker, com e-mail baseado em UUID e nome de produto com sufixo aleatório. Nenhum teste depende de dados pré-existentes no ambiente nem de outro teste.
 - **Pré-condições via API**: os testes E2E preparam o cenário pela API (`cy.criarUsuarioViaApi`, `cy.criarProdutoViaApi`), que é mais rápida e estável, e usam a interface só para o que estão validando. O comando `cy.visitarAutenticado` abre o front já logado para não repetir o login pela tela.
-- **Limpeza automática**: tudo o que é criado fica registrado e é excluído em um `afterEach` global, inclusive quando o teste falha. Nos testes E2E, o `_id` de um cadastro feito pela tela é capturado com `cy.intercept`.
+- **Limpeza automática**: tudo o que é criado fica registrado e é excluído em um `afterEach` global, inclusive quando o teste falha. Nos testes E2E, os comandos `cy.observarCadastroDeUsuario` e `cy.observarCadastroDeProduto` interceptam a resposta da API e registram o que a tela criou, mesmo que o teste falhe em seguida. Se uma exclusão falhar, um aviso aparece no terminal e no log do pipeline, sem reprovar o teste.
 
 > **Atenção:** o Cypress empacota o `support` e cada spec separadamente. Se um spec importasse o gerenciador de massa diretamente, usaria outra instância do módulo, e o `afterEach` global não veria o registro. Por isso o registro é exposto como comando (`cy.registrarUsuarioParaLimpeza`) e uma regra do ESLint bloqueia o import direto nos specs.
 
@@ -199,23 +199,27 @@ A execução diária existe porque o ServeRest é um ambiente público e compart
 ## Segurança
 
 - **Nenhuma credencial no repositório**: não há usuário fixo; cada teste cria e remove os próprios usuários. `cypress.env.json` e `.env` estão no `.gitignore` por precaução.
-- **Senhas fora do log**: o campo de senha é digitado com `{ log: false }`.
+- **Senhas descartáveis**: cada senha é gerada aleatoriamente e apagada junto com o usuário ao final do teste. Na interface, o campo de senha é digitado com `{ log: false }`. Nas chamadas de API, o corpo da requisição aparece no log de comandos do Cypress, o que é aceitável por serem dados de teste; com credenciais reais, a requisição também usaria `log: false`.
 - **Configuração pública separada de segredos**: a URL da API usa `expose` do Cypress 16, que é próprio para valores públicos. Se um dia houver segredo, ele deve vir de variável de ambiente lida com `cy.env()` e, no CI, de _GitHub Secrets_.
 - **Pipeline com menor privilégio**: `permissions: contents: read`.
 - **Dependências auditadas**: `npm audit` sem vulnerabilidades. Versões transitivas vulneráveis foram corrigidas com `overrides`, e o Dependabot mantém npm e actions atualizados.
 
 ## Decisões técnicas
 
-| Decisão                                     | Motivo                                                                                                                                    |
-| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Seletores `data-testid`                     | São estáveis e independentes de estilo e texto; o front do ServeRest já os oferece.                                                       |
-| Nenhum `cy.wait(ms)`                        | Sincronização por asserções com retry e `cy.intercept`; esperas fixas deixam o teste lento e instável.                                    |
-| `retries` só no `runMode`                   | Tolera instabilidade do ambiente público no CI sem esconder flakiness durante o desenvolvimento.                                          |
-| Asserções sobre a requisição nos testes E2E | Além da tela, o `cy.intercept` confirma o status que o front recebeu da API, o que ajuda a diferenciar erro de front de erro de back-end. |
-| Mensagens e rotas em constantes             | Se um texto mudar na aplicação, a correção é feita em um único lugar.                                                                     |
-| JavaScript com ES Modules                   | Atende ao requisito do desafio e mantém a mesma sintaxe de `import` no Node e no browser.                                                 |
+| Decisão                                     | Motivo                                                                                                                                                                                          |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Seletores `data-testid`                     | São estáveis e independentes de estilo e texto. Onde o front não os oferece (título `h1`, alertas `.alert` e linhas da tabela de produtos), o seletor de estrutura fica isolado no page object. |
+| Nenhum `cy.wait(ms)`                        | Sincronização por asserções com retry e `cy.intercept`; esperas fixas deixam o teste lento e instável.                                                                                          |
+| `retries` só no `runMode`                   | Tolera instabilidade do ambiente público no CI sem esconder flakiness durante o desenvolvimento.                                                                                                |
+| Asserções sobre a requisição nos testes E2E | Além da tela, o `cy.intercept` confirma o status que o front recebeu da API, o que ajuda a diferenciar erro de front de erro de back-end.                                                       |
+| Mensagens e rotas em constantes             | Se um texto mudar na aplicação, a correção é feita em um único lugar.                                                                                                                           |
+| Efeito colateral nos negativos da API       | Além de status e mensagem, os casos de duplicidade e de falta de permissão consultam a API para confirmar que nada foi criado.                                                                  |
+| Asserção por célula na listagem             | Comparar o texto da linha inteira deixaria um valor casar com outro campo (por exemplo, a quantidade 4 dentro do preço 1648).                                                                   |
+| JavaScript com ES Modules                   | Atende ao requisito do desafio e mantém a mesma sintaxe de `import` no Node e no browser.                                                                                                       |
 
 ### Observações sobre a aplicação
 
 - A home administrativa mostra `Bem Vindo` com **espaço duplo** antes do nome. O teste valida a saudação e o nome separadamente, para não depender desse detalhe de espaçamento.
 - O ServeRest público é compartilhado com outras pessoas, por isso nenhum teste depende de dados que já existam nele e toda massa criada é removida ao final.
+- **Achado de segurança:** `GET /usuarios` devolve a senha de todos os usuários em texto puro. Em uma aplicação real isso seria um defeito crítico: senhas devem ser armazenadas com hash e nunca retornadas pela API.
+- `DELETE /usuarios/{_id}` responde 200 mesmo quando nada é excluído ("Nenhum registro excluído"). Por isso a limpeza de massa confere a mensagem, e não só o status.
