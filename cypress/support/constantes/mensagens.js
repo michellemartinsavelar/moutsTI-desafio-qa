@@ -10,6 +10,9 @@ export const MENSAGENS = {
   cadastro: {
     sucesso: 'Cadastro realizado com sucesso',
   },
+  exclusao: {
+    sucesso: 'Registro excluído com sucesso',
+  },
   usuario: {
     emailEmUso: 'Este email já está sendo usado',
   },

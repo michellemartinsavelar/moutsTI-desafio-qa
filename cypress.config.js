@@ -17,6 +17,15 @@ export default defineConfig({
     },
     setupNodeEvents(on) {
       registrarRelatorio(on)
+
+      on('task', {
+        // Exibe no terminal avisos que não devem reprovar o teste (ex.: falha na limpeza de massa)
+        avisar(mensagem) {
+          process.stderr.write(`[AVISO] ${mensagem}\n`)
+
+          return null
+        },
+      })
     },
     viewportWidth: 1366,
     viewportHeight: 768,
