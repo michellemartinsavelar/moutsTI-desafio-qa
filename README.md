@@ -36,30 +36,33 @@ Este projeto é a minha entrega para o teste técnico da vaga de **Senior QA Tes
 | Boas práticas e qualidade do código | [Qualidade de código e commits](#qualidade-de-código-e-commits) e [Decisões técnicas](#decisões-técnicas)                             |
 | Padrões de projeto                  | [Padrões de projeto](#padrões-de-projeto): Page Object, Service Object, Factory e testes orientados a dados                           |
 | Assertivas claras e adequadas       | Status, mensagem e contrato (JSON Schema) na API; tela e requisição interceptada no E2E. Veja [Cenários cobertos](#cenários-cobertos) |
-| Escrita e organização dos cenários  | Um arquivo por funcionalidade em `cypress/e2e/api` e `cypress/e2e/ui`. Veja [Estrutura do projeto](#estrutura-do-projeto)             |
+| Escrita e organização dos cenários  | `describe` / `context` / `it` padronizados, com ID por caso e [plano de testes](docs/plano-de-testes.md) rastreável                   |
 | Uso de massa de dados               | [Massa de dados](#massa-de-dados): dados dinâmicos, pré-condições via API e limpeza automática                                        |
 | CI/CD, segurança e documentação     | [CI/CD](#cicd), [Segurança](#segurança) e este README                                                                                 |
 | Qualidade e clareza dos commits     | Commits pequenos no padrão Conventional Commits, validados pelo commitlint                                                            |
 
 ## Cenários cobertos
 
-São **3 cenários de API** e **3 cenários E2E**. Cada um tem casos positivos e negativos, num total de 22 testes.
+São **3 cenários de API** e **3 cenários E2E**, com casos positivos e negativos, num total de **22 casos de teste**. Cada caso tem um ID único, que aparece no título do teste e no relatório.
 
-### API
+| Camada | Cenário             | Positivos | Negativos | IDs                         |
+| ------ | ------------------- | --------- | --------- | --------------------------- |
+| API    | Login               | 1         | 4         | `API-LOG-01` a `API-LOG-05` |
+| API    | Cadastro de usuário | 1         | 5         | `API-USU-01` a `API-USU-06` |
+| API    | Cadastro de produto | 1         | 3         | `API-PRO-01` a `API-PRO-04` |
+| E2E    | Login               | 2         | 1         | `E2E-LOG-01` a `E2E-LOG-03` |
+| E2E    | Cadastro de usuário | 1         | 1         | `E2E-USU-01` e `E2E-USU-02` |
+| E2E    | Cadastro de produto | 1         | 1         | `E2E-PRO-01` e `E2E-PRO-02` |
 
-| Cenário                 | Casos                                                                                                                                                             |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Login**               | ✅ autenticação válida com validação de contrato<br>❌ senha incorreta<br>❌ e-mail não cadastrado<br>❌ campos ausentes<br>❌ campos em branco                   |
-| **Cadastro de usuário** | ✅ cadastro com persistência dos dados (POST + GET) e contrato<br>❌ e-mail já utilizado<br>❌ cada campo inválido (`nome`, `email`, `password`, `administrador`) |
-| **Cadastro de produto** | ✅ cadastro por administrador com persistência e contrato<br>❌ sem token (401)<br>❌ usuário sem permissão (403)<br>❌ nome já utilizado                         |
+O **[plano de testes](docs/plano-de-testes.md)** descreve cada caso em Dado / Quando / Então e explica como vinculá-los a casos de teste no Jira ou no Azure Test Plans.
 
-### E2E
+Os testes seguem sempre a mesma estrutura, e o relatório se lê como uma especificação:
 
-| Cenário                 | Casos                                                                                                                  |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| **Login**               | ✅ administrador vai para a home administrativa<br>✅ usuário comum vai para a loja<br>❌ senha incorreta exibe alerta |
-| **Cadastro de usuário** | ✅ cadastro de administrador pela interface e redirecionamento<br>❌ e-mail já utilizado exibe alerta                  |
-| **Cadastro de produto** | ✅ administrador cadastra produto e ele aparece na listagem<br>❌ nome já utilizado exibe alerta                       |
+```
+API | Login - POST /login                         ← describe: funcionalidade e endpoint
+  com credenciais inválidas                       ← context: condição de negócio
+    ✓ [API-LOG-02] deve retornar 401 quando a senha estiver incorreta   ← it: ID e resultado esperado
+```
 
 ## Tecnologias
 
@@ -134,6 +137,8 @@ O projeto não precisa de nenhuma credencial: cada teste cria os próprios usuá
 │   ├── workflows/testes.yml        # pipeline de CI
 │   └── dependabot.yml              # atualização automática de dependências
 ├── .husky/                         # hooks de pre-commit e commit-msg
+├── docs/
+│   └── plano-de-testes.md          # casos de teste com IDs, passos e rastreabilidade
 ├── cypress/
 │   ├── e2e/
 │   │   ├── api/                    # testes de API (um arquivo por recurso)
