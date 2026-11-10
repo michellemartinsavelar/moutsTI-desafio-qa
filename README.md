@@ -80,6 +80,9 @@ São **3 cenários de API** e **3 cenários E2E**. Cada um tem casos positivos e
 
 - Node.js **22.13 ou superior** (a versão de referência está no `.nvmrc`; com nvm, rode `nvm use`)
 - npm
+- Git (no Windows, o [Git for Windows](https://gitforwindows.org/), que também roda os hooks do Husky)
+
+O projeto funciona em **macOS, Linux e Windows**. O pipeline roda lint e testes em Linux e em Windows a cada push. No Windows, o `nvm-windows` não lê o `.nvmrc`: instale a versão com `nvm install 22` e `nvm use 22`, ou baixe o Node pelo [site oficial](https://nodejs.org/).
 
 ### Instalação
 
@@ -109,8 +112,16 @@ Depois da execução, o relatório fica em `cypress/reports/index.html`.
 
 As URLs têm valores padrão apontando para o ServeRest público e podem ser trocadas por variável de ambiente, sem alterar código:
 
+macOS e Linux:
+
 ```bash
 BASE_URL=http://localhost:3000 API_URL=http://localhost:3001 npm test
+```
+
+Windows (PowerShell):
+
+```powershell
+$env:BASE_URL="http://localhost:3000"; $env:API_URL="http://localhost:3001"; npm test
 ```
 
 O projeto não precisa de nenhuma credencial: cada teste cria os próprios usuários. Veja [Segurança](#segurança).
@@ -173,8 +184,10 @@ Para incluir uma funcionalidade nova, o caminho é sempre o mesmo: um serviço e
 O workflow [`testes.yml`](.github/workflows/testes.yml) roda em push e pull request para `main`, diariamente às 06h (horário de Brasília) e manualmente (`workflow_dispatch`).
 
 1. **Lint e formatação**: falha rápido, sem baixar o binário do Cypress.
-2. **Testes API** e **Testes UI**: rodam em paralelo (matriz) no Chrome, só depois do lint passar. `fail-fast: false` garante que uma suíte não interrompa a outra.
-3. **Relatório**: o HTML de cada suíte é publicado como artefato (`relatorio-api`, `relatorio-ui`), e o resumo aparece na página da execução.
+2. **Testes API** e **Testes UI**: rodam em paralelo no Chrome, só depois do lint passar. `fail-fast: false` garante que uma suíte não interrompa a outra.
+3. **Relatório**: o HTML de cada suíte é publicado como artefato (por exemplo, `relatorio-ui-windows`), e o resumo aparece na página da execução.
+
+Todos os jobs rodam em matriz com **Linux** (`ubuntu-24.04`) e **Windows** (`windows-2025`). O arquivo `.gitattributes` mantém o fim de linha LF nos dois sistemas; sem ele, o Git no Windows converteria os arquivos para CRLF e o Prettier acusaria todos eles.
 
 A execução diária existe porque o ServeRest é um ambiente público e compartilhado: ela detecta mudanças na aplicação mesmo sem commits no projeto.
 
