@@ -1,0 +1,22 @@
+# Dependências
+node_modules/
+
+# Artefatos gerados pelo Cypress
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
+cypress/reports/
+
+# Variáveis de ambiente locais (nunca versionar)
+.env
+.env.*
+!.env.example
+cypress.env.json
+
+# Pacote de entrega
+*.zip
+
+# Sistema operacional e editores
+.DS_Store
+.idea/
+.vscode/
