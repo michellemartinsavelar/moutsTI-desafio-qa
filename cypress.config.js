@@ -1,10 +1,22 @@
 import { defineConfig } from 'cypress'
+import registrarRelatorio from 'cypress-mochawesome-reporter/plugin.js'
 
 export default defineConfig({
+  reporter: 'cypress-mochawesome-reporter',
+  reporterOptions: {
+    reportDir: 'cypress/reports',
+    reportPageTitle: 'Relatório de testes - ServeRest',
+    charts: true,
+    embeddedScreenshots: true,
+    inlineAssets: true,
+  },
   e2e: {
     baseUrl: process.env.BASE_URL ?? 'https://front.serverest.dev',
     expose: {
       apiUrl: process.env.API_URL ?? 'https://serverest.dev',
+    },
+    setupNodeEvents(on) {
+      registrarRelatorio(on)
     },
     viewportWidth: 1366,
     viewportHeight: 768,
