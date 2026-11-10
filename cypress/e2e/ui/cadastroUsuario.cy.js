@@ -7,7 +7,7 @@ import { MENSAGENS } from '../../support/constantes/mensagens'
 
 describe('E2E | Cadastro de usuário', () => {
   beforeEach(() => {
-    cy.intercept('POST', `${Cypress.expose('apiUrl')}/usuarios`).as('cadastrarUsuario')
+    cy.observarCadastroDeUsuario('cadastrarUsuario')
     cadastroUsuarioPagina.visitar()
   })
 
@@ -17,10 +17,7 @@ describe('E2E | Cadastro de usuário', () => {
 
       cadastroUsuarioPagina.cadastrar(administrador)
 
-      cy.wait('@cadastrarUsuario').then(({ response }) => {
-        expect(response.statusCode).to.equal(201)
-        cy.registrarUsuarioParaLimpeza(response.body._id)
-      })
+      cy.wait('@cadastrarUsuario').its('response.statusCode').should('equal', 201)
       alerta.comTexto(MENSAGENS.cadastro.sucesso).should('be.visible')
       cy.location('pathname').should('equal', ROTAS.homeAdministrador)
       // O front exibe espaço duplo após "Bem Vindo": as partes são validadas separadamente

@@ -10,7 +10,7 @@ describe('E2E | Cadastro de produto', () => {
 
   // Pré-condição comum: administrador autenticado na tela de cadastro de produtos
   beforeEach(() => {
-    cy.intercept('POST', `${Cypress.expose('apiUrl')}/produtos`).as('cadastrarProduto')
+    cy.observarCadastroDeProduto('cadastrarProduto')
 
     cy.criarUsuarioViaApi({ administrador: 'true' }).then((administrador) => {
       cy.obterTokenViaApi(administrador).then((token) => {
@@ -26,10 +26,7 @@ describe('E2E | Cadastro de produto', () => {
 
       cadastroProdutoPagina.cadastrar(produto)
 
-      cy.wait('@cadastrarProduto').then(({ response }) => {
-        expect(response.statusCode).to.equal(201)
-        cy.registrarProdutoParaLimpeza(response.body._id, tokenAdministrador)
-      })
+      cy.wait('@cadastrarProduto').its('response.statusCode').should('equal', 201)
       cy.location('pathname').should('equal', ROTAS.listagemProdutos)
       // Cada coluna é validada separadamente: comparar o texto da linha inteira
       // deixaria um valor "casar" com outro campo (ex.: quantidade 4 dentro do preço 1648)
