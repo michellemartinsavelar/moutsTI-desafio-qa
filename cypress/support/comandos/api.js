@@ -39,3 +39,17 @@ Cypress.Commands.add('criarProdutoViaApi', (token, sobrescritas = {}) => {
     return { ...produto, _id: resposta.body._id }
   })
 })
+
+/**
+ * Registro de massa criada diretamente pelos specs.
+ * Precisa ser um comando porque o Cypress empacota o support e cada spec
+ * separadamente: um import direto do gerenciador no spec usaria outra instância
+ * do módulo, e o afterEach global não enxergaria o registro.
+ */
+Cypress.Commands.add('registrarUsuarioParaLimpeza', (id) => {
+  registrarUsuario(id)
+})
+
+Cypress.Commands.add('registrarProdutoParaLimpeza', (id, token) => {
+  registrarProduto(id, token)
+})
