@@ -4,68 +4,71 @@ import { validarContrato } from '../../support/contratos/validarContrato'
 import { MENSAGENS } from '../../support/constantes/mensagens'
 import contratoLoginSucesso from '../../fixtures/contratos/loginSucesso.json'
 
-describe('API - Login', () => {
-  context('com usuário cadastrado', () => {
-    let usuario
-
-    beforeEach(() => {
-      cy.criarUsuarioViaApi().then((usuarioCriado) => {
-        usuario = usuarioCriado
-      })
-    })
-
-    it('deve autenticar com credenciais válidas e retornar o token', () => {
-      loginServico.autenticar(usuario).then((resposta) => {
-        expect(resposta.status).to.equal(200)
-        expect(resposta.body.message).to.equal(MENSAGENS.login.sucesso)
-        validarContrato(resposta.body, contratoLoginSucesso)
-      })
-    })
-
-    it('não deve autenticar com senha incorreta', () => {
-      loginServico
-        .autenticar({ email: usuario.email, password: 'senhaIncorreta' })
-        .then((resposta) => {
-          expect(resposta.status).to.equal(401)
-          expect(resposta.body.message).to.equal(MENSAGENS.login.credenciaisInvalidas)
-          expect(resposta.body).not.to.have.property('authorization')
+describe('API | Login - POST /login', () => {
+  context('com credenciais válidas', () => {
+    it('[API-LOG-01] deve retornar 200 com o token de acesso no contrato esperado', () => {
+      cy.criarUsuarioViaApi().then((usuario) => {
+        loginServico.autenticar(usuario).then((resposta) => {
+          expect(resposta.status).to.equal(200)
+          expect(resposta.body.message).to.equal(MENSAGENS.login.sucesso)
+          validarContrato(resposta.body, contratoLoginSucesso)
         })
+      })
     })
   })
 
-  it('não deve autenticar com e-mail não cadastrado', () => {
-    const usuarioNaoCadastrado = gerarUsuario()
+  context('com credenciais inválidas', () => {
+    it('[API-LOG-02] deve retornar 401 quando a senha estiver incorreta', () => {
+      cy.criarUsuarioViaApi().then((usuario) => {
+        loginServico
+          .autenticar({ email: usuario.email, password: 'senhaIncorreta' })
+          .then((resposta) => {
+            expect(resposta.status).to.equal(401)
+            expect(resposta.body.message).to.equal(MENSAGENS.login.credenciaisInvalidas)
+            expect(resposta.body).not.to.have.property('authorization')
+          })
+      })
+    })
 
-    loginServico.autenticar(usuarioNaoCadastrado).then((resposta) => {
-      expect(resposta.status).to.equal(401)
-      expect(resposta.body.message).to.equal(MENSAGENS.login.credenciaisInvalidas)
+    it('[API-LOG-03] deve retornar 401 quando o e-mail não estiver cadastrado', () => {
+      const usuarioNaoCadastrado = gerarUsuario()
+
+      loginServico.autenticar(usuarioNaoCadastrado).then((resposta) => {
+        expect(resposta.status).to.equal(401)
+        expect(resposta.body.message).to.equal(MENSAGENS.login.credenciaisInvalidas)
+        expect(resposta.body).not.to.have.property('authorization')
+      })
     })
   })
 
-  const camposObrigatorios = [
-    {
-      cenario: 'e-mail e senha ausentes',
-      credenciais: {},
-      errosEsperados: {
-        email: 'email é obrigatório',
-        password: 'password é obrigatório',
+  context('com campos obrigatórios não preenchidos', () => {
+    const casos = [
+      {
+        id: 'API-LOG-04',
+        condicao: 'e-mail e senha não forem enviados',
+        credenciais: {},
+        errosEsperados: {
+          email: 'email é obrigatório',
+          password: 'password é obrigatório',
+        },
       },
-    },
-    {
-      cenario: 'e-mail e senha em branco',
-      credenciais: { email: '', password: '' },
-      errosEsperados: {
-        email: 'email não pode ficar em branco',
-        password: 'password não pode ficar em branco',
+      {
+        id: 'API-LOG-05',
+        condicao: 'e-mail e senha estiverem em branco',
+        credenciais: { email: '', password: '' },
+        errosEsperados: {
+          email: 'email não pode ficar em branco',
+          password: 'password não pode ficar em branco',
+        },
       },
-    },
-  ]
+    ]
 
-  camposObrigatorios.forEach(({ cenario, credenciais, errosEsperados }) => {
-    it(`não deve autenticar com ${cenario}`, () => {
-      loginServico.autenticar(credenciais).then((resposta) => {
-        expect(resposta.status).to.equal(400)
-        expect(resposta.body).to.deep.equal(errosEsperados)
+    casos.forEach(({ id, condicao, credenciais, errosEsperados }) => {
+      it(`[${id}] deve retornar 400 quando ${condicao}`, () => {
+        loginServico.autenticar(credenciais).then((resposta) => {
+          expect(resposta.status).to.equal(400)
+          expect(resposta.body).to.deep.equal(errosEsperados)
+        })
       })
     })
   })

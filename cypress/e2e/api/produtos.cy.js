@@ -5,64 +5,68 @@ import { MENSAGENS } from '../../support/constantes/mensagens'
 import contratoCadastroSucesso from '../../fixtures/contratos/cadastroSucesso.json'
 import contratoProduto from '../../fixtures/contratos/produto.json'
 
-describe('API - Produtos', () => {
-  let tokenAdministrador
+describe('API | Cadastro de produto - POST /produtos', () => {
+  context('com usuário administrador autenticado', () => {
+    let tokenAdministrador
 
-  beforeEach(() => {
-    cy.criarUsuarioViaApi()
-      .then((administrador) => cy.obterTokenViaApi(administrador))
-      .then((token) => {
-        tokenAdministrador = token
-      })
-  })
+    beforeEach(() => {
+      cy.criarUsuarioViaApi({ administrador: 'true' })
+        .then((administrador) => cy.obterTokenViaApi(administrador))
+        .then((token) => {
+          tokenAdministrador = token
+        })
+    })
 
-  it('deve cadastrar um produto como administrador e persistir os dados informados', () => {
-    const produto = gerarProduto()
+    it('[API-PRO-01] deve retornar 201 e persistir o produto com os dados informados', () => {
+      const produto = gerarProduto()
 
-    produtosServico
-      .cadastrar(produto, tokenAdministrador)
-      .then((resposta) => {
-        expect(resposta.status).to.equal(201)
-        expect(resposta.body.message).to.equal(MENSAGENS.cadastro.sucesso)
-        validarContrato(resposta.body, contratoCadastroSucesso)
-        cy.registrarProdutoParaLimpeza(resposta.body._id, tokenAdministrador)
+      produtosServico
+        .cadastrar(produto, tokenAdministrador)
+        .then((resposta) => {
+          expect(resposta.status).to.equal(201)
+          expect(resposta.body.message).to.equal(MENSAGENS.cadastro.sucesso)
+          validarContrato(resposta.body, contratoCadastroSucesso)
+          cy.registrarProdutoParaLimpeza(resposta.body._id, tokenAdministrador)
 
-        return produtosServico.buscarPorId(resposta.body._id)
-      })
-      .then((resposta) => {
-        expect(resposta.status).to.equal(200)
-        expect(resposta.body).to.include(produto)
-        validarContrato(resposta.body, contratoProduto)
-      })
-  })
+          return produtosServico.buscarPorId(resposta.body._id)
+        })
+        .then((resposta) => {
+          expect(resposta.status).to.equal(200)
+          expect(resposta.body).to.include(produto)
+          validarContrato(resposta.body, contratoProduto)
+        })
+    })
 
-  it('não deve cadastrar um produto sem token de autenticação', () => {
-    produtosServico.cadastrar(gerarProduto()).then((resposta) => {
-      expect(resposta.status).to.equal(401)
-      expect(resposta.body.message).to.equal(MENSAGENS.autorizacao.tokenInvalido)
+    it('[API-PRO-02] deve retornar 400 quando o nome do produto já estiver em uso', () => {
+      cy.criarProdutoViaApi(tokenAdministrador)
+        .then((produtoExistente) => {
+          const produtoComMesmoNome = gerarProduto({ nome: produtoExistente.nome })
+
+          return produtosServico.cadastrar(produtoComMesmoNome, tokenAdministrador)
+        })
+        .then((resposta) => {
+          expect(resposta.status).to.equal(400)
+          expect(resposta.body.message).to.equal(MENSAGENS.produto.nomeEmUso)
+        })
     })
   })
 
-  it('não deve cadastrar um produto com usuário que não é administrador', () => {
-    cy.criarUsuarioViaApi({ administrador: 'false' })
-      .then((usuarioComum) => cy.obterTokenViaApi(usuarioComum))
-      .then((tokenUsuarioComum) => produtosServico.cadastrar(gerarProduto(), tokenUsuarioComum))
-      .then((resposta) => {
-        expect(resposta.status).to.equal(403)
-        expect(resposta.body.message).to.equal(MENSAGENS.autorizacao.somenteAdministrador)
+  context('sem permissão de acesso', () => {
+    it('[API-PRO-03] deve retornar 401 quando o token de acesso não for enviado', () => {
+      produtosServico.cadastrar(gerarProduto()).then((resposta) => {
+        expect(resposta.status).to.equal(401)
+        expect(resposta.body.message).to.equal(MENSAGENS.autorizacao.tokenInvalido)
       })
-  })
+    })
 
-  it('não deve cadastrar um produto com nome já utilizado', () => {
-    cy.criarProdutoViaApi(tokenAdministrador)
-      .then((produtoExistente) => {
-        const produtoComMesmoNome = gerarProduto({ nome: produtoExistente.nome })
-
-        return produtosServico.cadastrar(produtoComMesmoNome, tokenAdministrador)
-      })
-      .then((resposta) => {
-        expect(resposta.status).to.equal(400)
-        expect(resposta.body.message).to.equal(MENSAGENS.produto.nomeEmUso)
-      })
+    it('[API-PRO-04] deve retornar 403 quando o usuário não for administrador', () => {
+      cy.criarUsuarioViaApi({ administrador: 'false' })
+        .then((usuarioComum) => cy.obterTokenViaApi(usuarioComum))
+        .then((tokenUsuarioComum) => produtosServico.cadastrar(gerarProduto(), tokenUsuarioComum))
+        .then((resposta) => {
+          expect(resposta.status).to.equal(403)
+          expect(resposta.body.message).to.equal(MENSAGENS.autorizacao.somenteAdministrador)
+        })
+    })
   })
 })
