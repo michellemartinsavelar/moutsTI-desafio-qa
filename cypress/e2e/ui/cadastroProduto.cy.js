@@ -31,12 +31,18 @@ describe('E2E | Cadastro de produto', () => {
         cy.registrarProdutoParaLimpeza(response.body._id, tokenAdministrador)
       })
       cy.location('pathname').should('equal', ROTAS.listagemProdutos)
+      // Cada coluna é validada separadamente: comparar o texto da linha inteira
+      // deixaria um valor "casar" com outro campo (ex.: quantidade 4 dentro do preço 1648)
+      listagemProdutosPagina.celulaDoProduto(produto.nome, 'nome').should('have.text', produto.nome)
       listagemProdutosPagina
-        .linhaDoProduto(produto.nome)
-        .should('be.visible')
-        .and('contain.text', produto.preco)
-        .and('contain.text', produto.descricao)
-        .and('contain.text', produto.quantidade)
+        .celulaDoProduto(produto.nome, 'preco')
+        .should('have.text', String(produto.preco))
+      listagemProdutosPagina
+        .celulaDoProduto(produto.nome, 'descricao')
+        .should('have.text', produto.descricao)
+      listagemProdutosPagina
+        .celulaDoProduto(produto.nome, 'quantidade')
+        .should('have.text', String(produto.quantidade))
     })
   })
 
