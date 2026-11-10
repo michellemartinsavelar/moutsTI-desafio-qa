@@ -24,9 +24,18 @@ env:
 
 jobs:
   qualidade:
-    name: Lint e formatação
-    runs-on: ubuntu-24.04
+    name: Lint e formatação (${{ matrix.sistema.nome }})
+    runs-on: ${{ matrix.sistema.runner }}
     timeout-minutes: 10
+    # Linux e Windows garantem que o projeto funciona nos dois sistemas
+    strategy:
+      fail-fast: false
+      matrix:
+        sistema:
+          - nome: linux
+            runner: ubuntu-24.04
+          - nome: windows
+            runner: windows-2025
     steps:
       - name: Baixar o código
         uses: actions/checkout@v7
@@ -50,13 +59,18 @@ jobs:
         run: npm run format:check
 
   testes:
-    name: Testes ${{ matrix.suite.nome }}
+    name: Testes ${{ matrix.suite.nome }} (${{ matrix.sistema.nome }})
     needs: qualidade
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.sistema.runner }}
     timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
+        sistema:
+          - nome: linux
+            runner: ubuntu-24.04
+          - nome: windows
+            runner: windows-2025
         suite:
           - nome: api
             spec: cypress/e2e/api/**/*.cy.js
@@ -76,13 +90,13 @@ jobs:
         with:
           browser: chrome
           spec: ${{ matrix.suite.spec }}
-          summary-title: Testes ${{ matrix.suite.nome }}
+          summary-title: Testes ${{ matrix.suite.nome }} (${{ matrix.sistema.nome }})
 
       - name: Publicar o relatório HTML
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
-          name: relatorio-${{ matrix.suite.nome }}
+          name: relatorio-${{ matrix.suite.nome }}-${{ matrix.sistema.nome }}
           path: cypress/reports
           retention-days: 14
           if-no-files-found: ignore
