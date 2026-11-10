@@ -9,6 +9,10 @@ class ProdutosServico extends ServicoBase {
     return this.requisitar({ metodo: 'POST', corpo: produto, token })
   }
 
+  listar(filtros) {
+    return this.requisitar({ metodo: 'GET', filtros })
+  }
+
   buscarPorId(id) {
     return this.requisitar({ metodo: 'GET', caminho: `/${id}` })
   }

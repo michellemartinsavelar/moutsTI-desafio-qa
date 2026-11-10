@@ -9,6 +9,10 @@ class UsuariosServico extends ServicoBase {
     return this.requisitar({ metodo: 'POST', corpo: usuario })
   }
 
+  listar(filtros) {
+    return this.requisitar({ metodo: 'GET', filtros })
+  }
+
   buscarPorId(id) {
     return this.requisitar({ metodo: 'GET', caminho: `/${id}` })
   }

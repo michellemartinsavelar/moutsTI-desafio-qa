@@ -9,11 +9,12 @@ export default class ServicoBase {
     this.recurso = recurso
   }
 
-  requisitar({ metodo, caminho = '', corpo, token }) {
+  requisitar({ metodo, caminho = '', corpo, filtros, token }) {
     return cy.request({
       method: metodo,
       url: `${Cypress.expose('apiUrl')}/${this.recurso}${caminho}`,
       body: corpo,
+      qs: filtros,
       headers: token ? { Authorization: token } : {},
       failOnStatusCode: false,
     })
