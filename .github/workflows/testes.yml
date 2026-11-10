@@ -1,0 +1,88 @@
+name: Testes automatizados
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Execução diária às 06h (horário de Brasília) para detectar mudanças no ambiente público
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+# Menor privilégio: o pipeline só precisa ler o repositório
+permissions:
+  contents: read
+
+# Cancela execuções antigas da mesma branch quando um novo push chega
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  HUSKY: 0
+
+jobs:
+  qualidade:
+    name: Lint e formatação
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Configurar o Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+        env:
+          # O binário do Cypress não é necessário para o lint
+          CYPRESS_INSTALL_BINARY: 0
+
+      - name: Verificar lint
+        run: npm run lint
+
+      - name: Verificar formatação
+        run: npm run format:check
+
+  testes:
+    name: Testes ${{ matrix.suite.nome }}
+    needs: qualidade
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - nome: api
+            spec: cypress/e2e/api/**/*.cy.js
+          - nome: ui
+            spec: cypress/e2e/ui/**/*.cy.js
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Configurar o Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Executar os testes
+        uses: cypress-io/github-action@v7
+        with:
+          browser: chrome
+          spec: ${{ matrix.suite.spec }}
+          summary-title: Testes ${{ matrix.suite.nome }}
+
+      - name: Publicar o relatório HTML
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: relatorio-${{ matrix.suite.nome }}
+          path: cypress/reports
+          retention-days: 14
+          if-no-files-found: ignore
