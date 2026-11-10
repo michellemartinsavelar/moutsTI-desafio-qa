@@ -1,4 +1,4 @@
-# Desafio QA - Automação de testes do ServeRest
+# Desafio Técnico Mouts TI - Senior QA Tester
 
 [![Testes automatizados](https://github.com/michellemartinsavelar/moutsTI-desafio-qa/actions/workflows/testes.yml/badge.svg)](https://github.com/michellemartinsavelar/moutsTI-desafio-qa/actions/workflows/testes.yml)
 
@@ -6,6 +6,7 @@ Suíte de testes automatizados com **Cypress** e **JavaScript** para a aplicaç�
 
 ## Sumário
 
+- [Sobre o desafio](#sobre-o-desafio)
 - [Cenários cobertos](#cenários-cobertos)
 - [Tecnologias](#tecnologias)
 - [Como executar](#como-executar)
@@ -16,6 +17,29 @@ Suíte de testes automatizados com **Cypress** e **JavaScript** para a aplicaç�
 - [CI/CD](#cicd)
 - [Segurança](#segurança)
 - [Decisões técnicas](#decisões-técnicas)
+
+## Sobre o desafio
+
+Este projeto é a minha entrega para o teste técnico da vaga de **Senior QA Tester** na **Mouts TI**.
+
+### Escopo
+
+- Automatizar **3 cenários E2E** no front-end: [front.serverest.dev](https://front.serverest.dev/)
+- Automatizar **3 cenários de API** com base no Swagger: [serverest.dev](https://serverest.dev/)
+- Cobrir cenários **positivos e negativos**
+- Usar **Cypress** com **JavaScript** e hospedar o código em um repositório **público no GitHub**
+
+### Critérios de avaliação e onde encontrá-los
+
+| Critério                            | Onde está no projeto                                                                                                                  |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Boas práticas e qualidade do código | [Qualidade de código e commits](#qualidade-de-código-e-commits) e [Decisões técnicas](#decisões-técnicas)                             |
+| Padrões de projeto                  | [Padrões de projeto](#padrões-de-projeto): Page Object, Service Object, Factory e testes orientados a dados                           |
+| Assertivas claras e adequadas       | Status, mensagem e contrato (JSON Schema) na API; tela e requisição interceptada no E2E. Veja [Cenários cobertos](#cenários-cobertos) |
+| Escrita e organização dos cenários  | Um arquivo por funcionalidade em `cypress/e2e/api` e `cypress/e2e/ui`. Veja [Estrutura do projeto](#estrutura-do-projeto)             |
+| Uso de massa de dados               | [Massa de dados](#massa-de-dados): dados dinâmicos, pré-condições via API e limpeza automática                                        |
+| CI/CD, segurança e documentação     | [CI/CD](#cicd), [Segurança](#segurança) e este README                                                                                 |
+| Qualidade e clareza dos commits     | Commits pequenos no padrão Conventional Commits, validados pelo commitlint                                                            |
 
 ## Cenários cobertos
 
