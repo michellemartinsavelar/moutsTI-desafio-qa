@@ -18,7 +18,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "prepare": "husky"
+    "prepare": "husky",
+    "empacotar": "git archive --format=zip --output=moutsTI-desafio-qa.zip HEAD"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",
