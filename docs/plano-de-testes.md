@@ -1,17 +1,17 @@
 # Plano de testes - ServeRest
 
-Este documento descreve os casos de teste automatizados neste repositório. Cada caso tem um **ID único**, que aparece no título do teste (`it`) e no relatório de execução. É esse ID que liga o código ao plano de testes em uma ferramenta de gestão.
+Este documento descreve os 29 casos de teste automatizados neste repositório. Cada caso tem um **ID único**, que aparece no título do teste (`it`) e no relatório de execução. É esse ID que liga o código ao plano de testes em uma ferramenta de gestão.
 
 ## Escopo
 
 | Camada | Funcionalidade      | Alvo                                                 | Casos |
 | ------ | ------------------- | ---------------------------------------------------- | ----- |
-| API    | Login               | `POST /login`                                        | 5     |
+| API    | Login               | `POST /login`                                        | 7     |
 | API    | Cadastro de usuário | `POST /usuarios` e `GET /usuarios/{_id}`             | 6     |
-| API    | Cadastro de produto | `POST /produtos` e `GET /produtos/{_id}`             | 4     |
-| E2E    | Login               | `/login`                                             | 3     |
+| API    | Cadastro de produto | `POST /produtos` e `GET /produtos/{_id}`             | 7     |
+| E2E    | Login               | `/login`                                             | 4     |
 | E2E    | Cadastro de usuário | `/cadastrarusuarios`                                 | 2     |
-| E2E    | Cadastro de produto | `/admin/cadastrarprodutos` e `/admin/listarprodutos` | 2     |
+| E2E    | Cadastro de produto | `/admin/cadastrarprodutos` e `/admin/listarprodutos` | 3     |
 
 **Ambiente:** ServeRest público ([front.serverest.dev](https://front.serverest.dev/) e [serverest.dev](https://serverest.dev/)), no Chrome, em Linux e Windows.
 
@@ -52,7 +52,7 @@ Os passos abaixo estão no formato **Dado / Quando / Então** para facilitar o c
 ## Rastreabilidade com Jira ou Azure DevOps
 
 1. Cadastre cada caso deste documento como um caso de teste (Test no Xray/Zephyr, ou Test Case no Azure Test Plans), usando o ID e o título como resumo.
-2. Anote a chave gerada pela ferramenta (por exemplo, `QA-123` ou `#4567`) na coluna **Chave** das tabelas abaixo.
+2. Guarde a chave gerada pela ferramenta (por exemplo, `QA-123` ou `#4567`) junto do ID do caso.
 3. Se a ferramenta importar resultados pelo nome do teste (como o Xray, que reconhece a chave no título), acrescente a chave ao título do `it`, por exemplo `[API-LOG-02][QA-123] deve ...`.
 
 O ID interno continua valendo mesmo que a ferramenta de gestão mude.
@@ -61,13 +61,15 @@ O ID interno continua valendo mesmo que a ferramenta de gestão mude.
 
 ### API - Login (`cypress/e2e/api/login.cy.js`)
 
-| ID         | Caso de teste                      | Tipo     | Chave |
-| ---------- | ---------------------------------- | -------- | ----- |
-| API-LOG-01 | Login com credenciais válidas      | Positivo |       |
-| API-LOG-02 | Login com senha incorreta          | Negativo |       |
-| API-LOG-03 | Login com e-mail não cadastrado    | Negativo |       |
-| API-LOG-04 | Login sem enviar e-mail e senha    | Negativo |       |
-| API-LOG-05 | Login com e-mail e senha em branco | Negativo |       |
+| ID         | Caso de teste                      | Tipo     |
+| ---------- | ---------------------------------- | -------- |
+| API-LOG-01 | Login com credenciais válidas      | Positivo |
+| API-LOG-02 | Login com senha incorreta          | Negativo |
+| API-LOG-03 | Login com e-mail não cadastrado    | Negativo |
+| API-LOG-04 | Login sem enviar e-mail e senha    | Negativo |
+| API-LOG-05 | Login com e-mail e senha em branco | Negativo |
+| API-LOG-06 | Login sem enviar o e-mail          | Negativo |
+| API-LOG-07 | Login sem enviar a senha           | Negativo |
 
 **API-LOG-01 - Login com credenciais válidas**
 
@@ -98,16 +100,26 @@ O ID interno continua valendo mesmo que a ferramenta de gestão mude.
 - **Quando** envio `POST /login` com e-mail e senha vazios (`""`)
 - **Então** recebo status 400 com "email não pode ficar em branco" e "password não pode ficar em branco"
 
+**API-LOG-06 e API-LOG-07 - Login com um único campo ausente**
+
+- **Quando** envio `POST /login` sem um dos campos
+- **Então** recebo status 400 apenas com a mensagem do campo que faltou
+
+| ID         | Campo ausente | Mensagem esperada      |
+| ---------- | ------------- | ---------------------- |
+| API-LOG-06 | `email`       | email é obrigatório    |
+| API-LOG-07 | `password`    | password é obrigatório |
+
 ### API - Cadastro de usuário (`cypress/e2e/api/usuarios.cy.js`)
 
-| ID         | Caso de teste                                 | Tipo     | Chave |
-| ---------- | --------------------------------------------- | -------- | ----- |
-| API-USU-01 | Cadastro de usuário com dados válidos         | Positivo |       |
-| API-USU-02 | Cadastro com e-mail já utilizado              | Negativo |       |
-| API-USU-03 | Cadastro com nome em branco                   | Negativo |       |
-| API-USU-04 | Cadastro com e-mail em formato inválido       | Negativo |       |
-| API-USU-05 | Cadastro com senha em branco                  | Negativo |       |
-| API-USU-06 | Cadastro com perfil de administrador inválido | Negativo |       |
+| ID         | Caso de teste                                 | Tipo     |
+| ---------- | --------------------------------------------- | -------- |
+| API-USU-01 | Cadastro de usuário com dados válidos         | Positivo |
+| API-USU-02 | Cadastro com e-mail já utilizado              | Negativo |
+| API-USU-03 | Cadastro com nome em branco                   | Negativo |
+| API-USU-04 | Cadastro com e-mail em formato inválido       | Negativo |
+| API-USU-05 | Cadastro com senha em branco                  | Negativo |
+| API-USU-06 | Cadastro com perfil de administrador inválido | Negativo |
 
 **API-USU-01 - Cadastro de usuário com dados válidos**
 
@@ -136,12 +148,15 @@ O ID interno continua valendo mesmo que a ferramenta de gestão mude.
 
 ### API - Cadastro de produto (`cypress/e2e/api/produtos.cy.js`)
 
-| ID         | Caso de teste                                     | Tipo     | Chave |
-| ---------- | ------------------------------------------------- | -------- | ----- |
-| API-PRO-01 | Cadastro de produto por administrador             | Positivo |       |
-| API-PRO-02 | Cadastro de produto com nome já utilizado         | Negativo |       |
-| API-PRO-03 | Cadastro de produto sem token de acesso           | Negativo |       |
-| API-PRO-04 | Cadastro de produto por usuário não administrador | Negativo |       |
+| ID         | Caso de teste                                     | Tipo     |
+| ---------- | ------------------------------------------------- | -------- |
+| API-PRO-01 | Cadastro de produto por administrador             | Positivo |
+| API-PRO-02 | Cadastro de produto com nome já utilizado         | Negativo |
+| API-PRO-03 | Cadastro de produto sem token de acesso           | Negativo |
+| API-PRO-04 | Cadastro de produto por usuário não administrador | Negativo |
+| API-PRO-05 | Cadastro de produto com preço zero                | Negativo |
+| API-PRO-06 | Cadastro de produto com quantidade negativa       | Negativo |
+| API-PRO-07 | Cadastro de produto com token inválido            | Negativo |
 
 **API-PRO-01 - Cadastro de produto por administrador**
 
@@ -170,38 +185,62 @@ O ID interno continua valendo mesmo que a ferramenta de gestão mude.
 - **Então** recebo status 403 e a mensagem "Rota exclusiva para administradores"
 - **E** o produto não é criado
 
+**API-PRO-05 e API-PRO-06 - Cadastro de produto com valor inválido**
+
+- **Dado** um administrador autenticado
+- **Quando** envio `POST /produtos` com um único campo numérico inválido
+- **Então** recebo status 400 apenas com a mensagem daquele campo
+
+| ID         | Campo        | Valor enviado | Mensagem esperada                      |
+| ---------- | ------------ | ------------- | -------------------------------------- |
+| API-PRO-05 | `preco`      | `0`           | preco deve ser um número positivo      |
+| API-PRO-06 | `quantidade` | `-1`          | quantidade deve ser maior ou igual a 0 |
+
+**API-PRO-07 - Cadastro de produto com token inválido**
+
+- **Quando** envio `POST /produtos` com um token malformado no cabeçalho `Authorization`
+- **Então** recebo status 401 e a mensagem "Token de acesso ausente, inválido, expirado ou usuário do token não existe mais"
+- **E** o produto não é criado
+
 ### E2E - Login (`cypress/e2e/ui/login.cy.js`)
 
-| ID         | Caso de teste             | Tipo     | Chave |
-| ---------- | ------------------------- | -------- | ----- |
-| E2E-LOG-01 | Login de administrador    | Positivo |       |
-| E2E-LOG-02 | Login de usuário comum    | Positivo |       |
-| E2E-LOG-03 | Login com senha incorreta | Negativo |       |
+| ID         | Caso de teste             | Tipo     |
+| ---------- | ------------------------- | -------- |
+| E2E-LOG-01 | Login de administrador    | Positivo |
+| E2E-LOG-02 | Login de usuário comum    | Positivo |
+| E2E-LOG-03 | Login com senha incorreta | Negativo |
+| E2E-LOG-04 | Login com campos vazios   | Negativo |
 
 **E2E-LOG-01 - Login de administrador**
 
 - **Dado** um administrador cadastrado e a tela de login aberta
 - **Quando** informo e-mail e senha e clico em "Entrar"
-- **Então** sou levado para `/admin/home`, vejo "Bem Vindo" com o meu nome e o botão "Logout"
+- **Então** a API responde 200, sou levado para `/admin/home`, vejo "Bem Vindo" com o meu nome e o botão "Logout"
 
 **E2E-LOG-02 - Login de usuário comum**
 
 - **Dado** um usuário comum cadastrado e a tela de login aberta
 - **Quando** informo e-mail e senha e clico em "Entrar"
-- **Então** sou levado para `/home`, vejo o título "Serverest Store" e o botão "Logout"
+- **Então** a API responde 200, sou levado para `/home`, vejo o título "Serverest Store" e o botão "Logout"
 
 **E2E-LOG-03 - Login com senha incorreta**
 
 - **Dado** um usuário cadastrado e a tela de login aberta
 - **Quando** informo o e-mail dele com uma senha errada e clico em "Entrar"
-- **Então** vejo o alerta "Email e/ou senha inválidos" e continuo em `/login`
+- **Então** a API responde 401, vejo o alerta "Email e/ou senha inválidos" e continuo em `/login`
+
+**E2E-LOG-04 - Login com campos vazios**
+
+- **Dado** a tela de login aberta
+- **Quando** clico em "Entrar" sem preencher nada
+- **Então** a API responde 400, vejo os alertas "Email é obrigatório" e "Password é obrigatório" e continuo em `/login`
 
 ### E2E - Cadastro de usuário (`cypress/e2e/ui/cadastroUsuario.cy.js`)
 
-| ID         | Caso de teste                            | Tipo     | Chave |
-| ---------- | ---------------------------------------- | -------- | ----- |
-| E2E-USU-01 | Cadastro de administrador pela interface | Positivo |       |
-| E2E-USU-02 | Cadastro com e-mail já utilizado         | Negativo |       |
+| ID         | Caso de teste                            | Tipo     |
+| ---------- | ---------------------------------------- | -------- |
+| E2E-USU-01 | Cadastro de administrador pela interface | Positivo |
+| E2E-USU-02 | Cadastro com e-mail já utilizado         | Negativo |
 
 **E2E-USU-01 - Cadastro de administrador pela interface**
 
@@ -217,10 +256,11 @@ O ID interno continua valendo mesmo que a ferramenta de gestão mude.
 
 ### E2E - Cadastro de produto (`cypress/e2e/ui/cadastroProduto.cy.js`)
 
-| ID         | Caso de teste                             | Tipo     | Chave |
-| ---------- | ----------------------------------------- | -------- | ----- |
-| E2E-PRO-01 | Cadastro de produto pela interface        | Positivo |       |
-| E2E-PRO-02 | Cadastro de produto com nome já utilizado | Negativo |       |
+| ID         | Caso de teste                             | Tipo     |
+| ---------- | ----------------------------------------- | -------- |
+| E2E-PRO-01 | Cadastro de produto pela interface        | Positivo |
+| E2E-PRO-02 | Cadastro de produto com nome já utilizado | Negativo |
+| E2E-PRO-03 | Cadastro de produto por usuário comum     | Negativo |
 
 **E2E-PRO-01 - Cadastro de produto pela interface**
 
@@ -233,6 +273,13 @@ O ID interno continua valendo mesmo que a ferramenta de gestão mude.
 - **Dado** um administrador autenticado na tela de cadastro de produtos e um produto já cadastrado
 - **Quando** preencho o formulário com o mesmo nome e clico em "Cadastrar"
 - **Então** a API responde 400, vejo o alerta "Já existe produto com esse nome" e continuo em `/admin/cadastrarprodutos`
+
+**E2E-PRO-03 - Cadastro de produto por usuário comum**
+
+- **Dado** um usuário comum autenticado na tela de cadastro de produtos (o front permite abrir a tela)
+- **Quando** preencho o formulário e clico em "Cadastrar"
+- **Então** a API responde 403, vejo o alerta "Rota exclusiva para administradores" e continuo em `/admin/cadastrarprodutos`
+- **E** o produto não é criado
 
 ## Massa de dados e limpeza
 
