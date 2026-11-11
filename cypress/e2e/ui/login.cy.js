@@ -15,7 +15,7 @@ describe('E2E | Login', () => {
         loginPagina.realizarLogin(administrador)
 
         cy.location('pathname').should('equal', ROTAS.homeAdministrador)
-        // O front exibe espaço duplo após "Bem Vindo": as partes são validadas separadamente
+        // o front coloca dois espaços depois de "Bem Vindo", por isso valido em duas partes
         homePagina
           .titulo()
           .should('contain.text', 'Bem Vindo')

@@ -1,11 +1,6 @@
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
-/**
- * Gera os dados de um usuário válido para o ServeRest.
- * O e-mail usa UUID para não colidir com outros usuários do ambiente público.
- *
- * @param {object} [sobrescritas] campos que devem substituir os valores gerados
- */
+// e-mail com UUID para não colidir com outros usuários do ambiente público
 export function gerarUsuario(sobrescritas = {}) {
   return {
     nome: faker.person.fullName(),

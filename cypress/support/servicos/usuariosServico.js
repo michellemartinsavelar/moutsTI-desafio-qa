@@ -8,8 +8,7 @@ class UsuariosServico extends ServicoBase {
 
   cadastrar(usuario) {
     return this.requisitar({ metodo: 'POST', corpo: usuario }).then((resposta) => {
-      // Registra para limpeza antes de qualquer assertiva do teste, inclusive
-      // quando a API cria um usuário que deveria ter recusado
+      // registro aqui, antes das assertivas do teste, para a limpeza não depender delas
       registrarUsuario(resposta.body?._id)
 
       return resposta

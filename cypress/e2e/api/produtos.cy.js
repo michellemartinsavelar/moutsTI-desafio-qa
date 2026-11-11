@@ -45,7 +45,7 @@ describe('API | Cadastro de produto - POST /produtos', () => {
           expect(resposta.body.message).to.equal(MENSAGENS.produto.nomeEmUso)
         })
 
-        // Efeito colateral: o cadastro recusado não pode ter criado um segundo produto
+        // o cadastro recusado não pode ter criado um segundo produto
         produtosServico.listar({ nome: produtoExistente.nome }).then((resposta) => {
           expect(resposta.body.quantidade, 'produtos com o nome').to.equal(1)
         })
@@ -62,7 +62,7 @@ describe('API | Cadastro de produto - POST /produtos', () => {
         expect(resposta.body.message).to.equal(MENSAGENS.autorizacao.tokenInvalido)
       })
 
-      // Efeito colateral: sem autenticação, o produto não pode ter sido criado
+      // sem token, o produto não pode ter sido criado
       produtosServico.listar({ nome: produto.nome }).then((resposta) => {
         expect(resposta.body.quantidade, 'produtos com o nome').to.equal(0)
       })
@@ -79,7 +79,7 @@ describe('API | Cadastro de produto - POST /produtos', () => {
           expect(resposta.body.message).to.equal(MENSAGENS.autorizacao.somenteAdministrador)
         })
 
-      // Efeito colateral: sem permissão, o produto não pode ter sido criado
+      // sem permissão, o produto não pode ter sido criado
       produtosServico.listar({ nome: produto.nome }).then((resposta) => {
         expect(resposta.body.quantidade, 'produtos com o nome').to.equal(0)
       })

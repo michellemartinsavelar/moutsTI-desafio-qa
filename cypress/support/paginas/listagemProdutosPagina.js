@@ -1,5 +1,5 @@
 class ListagemProdutosPagina {
-  // A tabela não possui data-testid: as células são localizadas pela ordem das colunas
+  // a tabela não tem data-testid, então pego a célula pela posição da coluna
   colunas = {
     nome: 0,
     preco: 1,

@@ -1,9 +1,4 @@
-/**
- * Base para os serviços da API: centraliza URL, cabeçalhos e o tratamento de status.
- *
- * `failOnStatusCode: false` deixa o teste decidir qual status é o esperado,
- * o que permite validar cenários negativos (400, 401, 403) com asserções explícitas.
- */
+// failOnStatusCode: false para o próprio teste validar 400, 401 e 403
 export default class ServicoBase {
   constructor(recurso) {
     this.recurso = recurso

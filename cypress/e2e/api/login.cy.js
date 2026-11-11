@@ -15,7 +15,7 @@ describe('API | Login - POST /login', () => {
           expect(resposta.body.message).to.equal(MENSAGENS.login.sucesso)
           validarContrato(resposta.body, contratoLoginSucesso)
 
-          // O formato do token não basta: ele precisa ser aceito por uma rota protegida
+          // o token só vale se uma rota protegida aceitar
           produtosServico
             .cadastrar(gerarProduto(), resposta.body.authorization)
             .its('status')

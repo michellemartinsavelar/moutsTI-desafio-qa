@@ -8,7 +8,6 @@ import { MENSAGENS } from '../../support/constantes/mensagens'
 describe('E2E | Cadastro de produto', () => {
   let tokenAdministrador
 
-  // Pré-condição comum: administrador autenticado na tela de cadastro de produtos
   beforeEach(() => {
     cy.observarCadastroDeProduto('cadastrarProduto')
 
@@ -28,8 +27,8 @@ describe('E2E | Cadastro de produto', () => {
 
       cy.wait('@cadastrarProduto').its('response.statusCode').should('equal', 201)
       cy.location('pathname').should('equal', ROTAS.listagemProdutos)
-      // Cada coluna é validada separadamente: comparar o texto da linha inteira
-      // deixaria um valor "casar" com outro campo (ex.: quantidade 4 dentro do preço 1648)
+      // valido coluna por coluna: no texto da linha inteira, a quantidade 4
+      // "passaria" por estar dentro do preço 1648
       listagemProdutosPagina.celulaDoProduto(produto.nome, 'nome').should('have.text', produto.nome)
       listagemProdutosPagina
         .celulaDoProduto(produto.nome, 'preco')

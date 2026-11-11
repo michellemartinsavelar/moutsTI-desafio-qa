@@ -29,17 +29,17 @@ export default defineConfig([
     files: ['cypress/**/*.js'],
     extends: [pluginCypress.configs.recommended, pluginMocha.configs.recommended],
     rules: {
-      // Nenhuma espera fixa: sincronização via asserções e intercepts
+      // sem espera fixa, force, pause ou debug nos testes
       'cypress/no-unnecessary-waiting': 'error',
       'cypress/no-force': 'error',
       'cypress/no-pause': 'error',
       'cypress/no-debug': 'error',
       'cypress/no-assigning-return-values': 'error',
       'cypress/unsafe-to-chain-command': 'error',
-      // Impede que it.only / it.skip cheguem ao repositório
+      // it.only e it.skip não podem chegar ao repositório
       'mocha/no-exclusive-tests': 'error',
       'mocha/no-pending-tests': 'error',
-      // Compatibilidade com o estilo do Cypress
+      // regras do mocha que não combinam com o jeito do Cypress
       'mocha/no-mocha-arrows': 'off',
       'mocha/no-async-in-sync-tests': 'off',
       'mocha/max-top-level-suites': 'off',

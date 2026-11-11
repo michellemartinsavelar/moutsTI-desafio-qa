@@ -1,11 +1,7 @@
-/**
- * Registra tudo o que os testes criam no ambiente para remover ao final de cada teste.
- * Assim cada teste é independente e o ambiente público do ServeRest não acumula lixo.
- *
- * O Cypress empacota o support e cada spec separadamente, então este módulo é
- * carregado mais de uma vez. O registro fica em um único objeto no escopo global
- * da página de teste, para que todas as cópias do módulo enxerguem a mesma massa.
- */
+// Guarda os IDs de tudo o que os testes criam, para apagar no final de cada um.
+// O Cypress empacota o support e cada spec separadamente, então este arquivo é
+// carregado mais de uma vez. Por isso o registro fica no escopo global: assim
+// todas as cópias enxergam a mesma lista.
 const massaRegistrada = (globalThis.massaDeTeste ??= { usuarios: [], produtos: [] })
 
 export function registrarUsuario(id) {
@@ -20,10 +16,7 @@ export function registrarProduto(id) {
   }
 }
 
-/**
- * Entrega a massa registrada para a tarefa de limpeza, que roda no Node e trata
- * cada exclusão separadamente (veja cypress/tarefas/limparMassa.js).
- */
+// a exclusão em si roda no Node: cypress/tarefas/limparMassa.js
 export function limparMassa() {
   const massa = {
     usuarios: massaRegistrada.usuarios,

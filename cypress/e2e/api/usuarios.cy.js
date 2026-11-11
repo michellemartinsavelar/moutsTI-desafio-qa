@@ -37,7 +37,7 @@ describe('API | Cadastro de usuário - POST /usuarios', () => {
           expect(resposta.body.message).to.equal(MENSAGENS.usuario.emailEmUso)
         })
 
-        // Efeito colateral: o cadastro recusado não pode ter criado um segundo usuário
+        // o cadastro recusado não pode ter criado um segundo usuário
         usuariosServico.listar({ email: usuarioExistente.email }).then((resposta) => {
           expect(resposta.body.quantidade, 'usuários com o e-mail').to.equal(1)
         })

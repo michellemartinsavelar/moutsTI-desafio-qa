@@ -1,7 +1,3 @@
-/**
- * Mensagens retornadas pelo ServeRest, centralizadas para que uma mudança
- * de texto na aplicação seja corrigida em um único lugar.
- */
 export const MENSAGENS = {
   login: {
     sucesso: 'Login realizado com sucesso',

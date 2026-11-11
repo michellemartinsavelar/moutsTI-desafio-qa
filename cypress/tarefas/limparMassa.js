@@ -1,13 +1,9 @@
 import { randomUUID } from 'node:crypto'
 import { MENSAGENS } from '../support/constantes/mensagens.js'
 
-/**
- * Limpeza da massa de teste, executada no processo Node do Cypress (cy.task).
- *
- * Rodar fora da fila de comandos do Cypress permite tratar cada exclusão
- * separadamente: um erro HTTP, um timeout ou uma falha de rede vira uma
- * pendência registrada, sem reprovar o teste e sem impedir as demais exclusões.
- */
+// Limpeza da massa, rodando no Node (cy.task) e não na fila de comandos do Cypress.
+// Assim cada exclusão é tratada sozinha: se uma falhar ou der timeout, vira um
+// aviso e as outras continuam.
 
 const TEMPO_LIMITE_MS = 10000
 
@@ -25,11 +21,8 @@ async function requisitar(url, { metodo, corpo, token }) {
   return { status: resposta.status, corpo: await resposta.json() }
 }
 
-/**
- * A exclusão de produtos exige um administrador. A limpeza usa uma credencial
- * própria, e não o token do teste, para conseguir remover também um produto
- * criado indevidamente por um usuário sem permissão.
- */
+// Produto só pode ser excluído por administrador. Crio um só para a limpeza,
+// porque o token do teste pode ser de um usuário sem permissão.
 async function cadastrarAdministradorDeLimpeza(apiUrl) {
   const administrador = {
     nome: 'Limpeza de massa',
@@ -62,12 +55,12 @@ async function autenticar(apiUrl, { email, password }) {
   return corpo.authorization
 }
 
-/** Devolve a descrição da pendência, ou null quando a exclusão deu certo. */
+// devolve o texto da pendência, ou null se excluiu
 async function excluir(url, descricao, token) {
   try {
     const { status, corpo } = await requisitar(url, { metodo: 'DELETE', token })
 
-    // A API responde 200 mesmo quando nada é excluído, por isso a mensagem é conferida
+    // a API responde 200 mesmo sem excluir nada, então confiro a mensagem
     if (corpo.message !== MENSAGENS.exclusao.sucesso) {
       return `${descricao} não foi excluído (${status} - ${corpo.message})`
     }
@@ -82,7 +75,7 @@ export async function limparMassa({ apiUrl, usuarios, produtos }) {
   const pendencias = []
   const usuariosParaExcluir = [...usuarios]
 
-  // Produtos primeiro: dependem do administrador de limpeza, que é excluído ao final
+  // produtos antes dos usuários: o administrador de limpeza é apagado por último
   if (produtos.length > 0) {
     try {
       const administrador = await cadastrarAdministradorDeLimpeza(apiUrl)

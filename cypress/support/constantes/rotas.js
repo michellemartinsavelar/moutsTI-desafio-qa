@@ -1,4 +1,3 @@
-/** Rotas do front-end do ServeRest. */
 export const ROTAS = {
   login: '/login',
   cadastroUsuario: '/cadastrarusuarios',

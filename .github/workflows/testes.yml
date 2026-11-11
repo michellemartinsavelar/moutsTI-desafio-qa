@@ -6,15 +6,15 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    # Execução diária às 06h (horário de Brasília) para detectar mudanças no ambiente público
+    # todo dia às 06h de Brasília, para pegar mudanças no ambiente público
     - cron: '0 9 * * *'
   workflow_dispatch:
 
-# Menor privilégio: o pipeline só precisa ler o repositório
+# o pipeline só precisa ler o repositório
 permissions:
   contents: read
 
-# Cancela execuções antigas da mesma branch quando um novo push chega
+# cancela a execução anterior da mesma branch quando chega um push novo
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -27,7 +27,6 @@ jobs:
     name: Lint e formatação (${{ matrix.sistema.nome }})
     runs-on: ${{ matrix.sistema.runner }}
     timeout-minutes: 10
-    # Linux e Windows garantem que o projeto funciona nos dois sistemas
     strategy:
       fail-fast: false
       matrix:
@@ -49,7 +48,7 @@ jobs:
       - name: Instalar dependências
         run: npm ci
         env:
-          # O binário do Cypress não é necessário para o lint
+          # o lint não precisa do binário do Cypress
           CYPRESS_INSTALL_BINARY: 0
 
       - name: Verificar lint
@@ -99,5 +98,5 @@ jobs:
           name: relatorio-${{ matrix.suite.nome }}-${{ matrix.sistema.nome }}
           path: cypress/reports
           retention-days: 14
-          # Uma execução sem relatório deve aparecer como aviso, e não passar despercebida
+          # sem relatório, quero ver um aviso
           if-no-files-found: warn

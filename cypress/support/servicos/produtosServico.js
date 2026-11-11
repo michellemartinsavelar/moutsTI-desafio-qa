@@ -8,8 +8,7 @@ class ProdutosServico extends ServicoBase {
 
   cadastrar(produto, token) {
     return this.requisitar({ metodo: 'POST', corpo: produto, token }).then((resposta) => {
-      // Registra para limpeza antes de qualquer assertiva do teste, inclusive
-      // quando a API cria um produto que deveria ter recusado
+      // registro aqui, antes das assertivas do teste, para a limpeza não depender delas
       registrarProduto(resposta.body?._id)
 
       return resposta

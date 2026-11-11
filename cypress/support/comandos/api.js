@@ -4,11 +4,7 @@ import loginServico from '../servicos/loginServico'
 import usuariosServico from '../servicos/usuariosServico'
 import produtosServico from '../servicos/produtosServico'
 
-/**
- * Comandos de pré-condição: preparam a massa via API, que é mais rápida e estável
- * que a interface. Falham cedo se a pré-condição não for atendida.
- * O que é criado aqui já sai registrado para limpeza pelos próprios serviços.
- */
+// pré-condições via API: mais rápidas e estáveis do que montar o cenário pela tela
 
 Cypress.Commands.add('criarUsuarioViaApi', (sobrescritas = {}) => {
   const usuario = gerarUsuario(sobrescritas)

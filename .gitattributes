@@ -1,8 +1,7 @@
-# Mantém LF em todos os sistemas operacionais. Sem isso, o Git no Windows
-# converte para CRLF no checkout e o Prettier acusa todos os arquivos.
+# LF em qualquer sistema: no Windows o Git converteria para CRLF e o Prettier reclamaria
 * text=auto eol=lf
 
-# Arquivos binários
+# binários
 *.png binary
 *.jpg binary
 *.zip binary
