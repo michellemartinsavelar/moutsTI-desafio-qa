@@ -69,6 +69,18 @@ describe('API | Login - POST /login', () => {
           password: 'password não pode ficar em branco',
         },
       },
+      {
+        id: 'API-LOG-06',
+        condicao: 'só o e-mail não for enviado',
+        credenciais: { password: 'qualquerSenha' },
+        errosEsperados: { email: 'email é obrigatório' },
+      },
+      {
+        id: 'API-LOG-07',
+        condicao: 'só a senha não for enviada',
+        credenciais: { email: 'qa@teste.com.br' },
+        errosEsperados: { password: 'password é obrigatório' },
+      },
     ]
 
     casos.forEach(({ id, condicao, credenciais, errosEsperados }) => {
