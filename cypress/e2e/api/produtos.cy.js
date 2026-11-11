@@ -51,6 +51,34 @@ describe('API | Cadastro de produto - POST /produtos', () => {
         })
       })
     })
+
+    const casos = [
+      {
+        id: 'API-PRO-05',
+        condicao: 'o preço for zero',
+        campo: 'preco',
+        valor: 0,
+        mensagem: 'preco deve ser um número positivo',
+      },
+      {
+        id: 'API-PRO-06',
+        condicao: 'a quantidade for negativa',
+        campo: 'quantidade',
+        valor: -1,
+        mensagem: 'quantidade deve ser maior ou igual a 0',
+      },
+    ]
+
+    casos.forEach(({ id, condicao, campo, valor, mensagem }) => {
+      it(`[${id}] deve retornar 400 quando ${condicao}`, () => {
+        const produto = gerarProduto({ [campo]: valor })
+
+        produtosServico.cadastrar(produto, tokenAdministrador).then((resposta) => {
+          expect(resposta.status).to.equal(400)
+          expect(resposta.body).to.deep.equal({ [campo]: mensagem })
+        })
+      })
+    })
   })
 
   context('sem permissão de acesso', () => {
@@ -80,6 +108,20 @@ describe('API | Cadastro de produto - POST /produtos', () => {
         })
 
       // sem permissão, o produto não pode ter sido criado
+      produtosServico.listar({ nome: produto.nome }).then((resposta) => {
+        expect(resposta.body.quantidade, 'produtos com o nome').to.equal(0)
+      })
+    })
+
+    it('[API-PRO-07] deve retornar 401 quando o token de acesso for inválido', () => {
+      const produto = gerarProduto()
+
+      produtosServico.cadastrar(produto, 'Bearer token-invalido').then((resposta) => {
+        expect(resposta.status).to.equal(401)
+        expect(resposta.body.message).to.equal(MENSAGENS.autorizacao.tokenInvalido)
+      })
+
+      // com token inválido, o produto não pode ter sido criado
       produtosServico.listar({ nome: produto.nome }).then((resposta) => {
         expect(resposta.body.quantidade, 'produtos com o nome').to.equal(0)
       })
