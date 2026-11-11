@@ -10,7 +10,6 @@ cypress/reports/
 # Variáveis de ambiente locais (nunca versionar)
 .env
 .env.*
-!.env.example
 cypress.env.json
 
 # Pacote de entrega
