@@ -99,4 +99,5 @@ jobs:
           name: relatorio-${{ matrix.suite.nome }}-${{ matrix.sistema.nome }}
           path: cypress/reports
           retention-days: 14
-          if-no-files-found: ignore
+          # Uma execução sem relatório deve aparecer como aviso, e não passar despercebida
+          if-no-files-found: warn
