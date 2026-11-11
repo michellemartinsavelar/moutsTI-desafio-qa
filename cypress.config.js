@@ -1,6 +1,7 @@
 import { defineConfig } from 'cypress'
 import registrarRelatorio from 'cypress-mochawesome-reporter/plugin.js'
 import { limparMassa } from './cypress/tarefas/limparMassa.js'
+import { avisarTestesInstaveis } from './cypress/tarefas/avisarTestesInstaveis.js'
 
 export default defineConfig({
   reporter: 'cypress-mochawesome-reporter',
@@ -20,6 +21,7 @@ export default defineConfig({
       registrarRelatorio(on)
 
       on('task', { limparMassa })
+      on('after:spec', avisarTestesInstaveis)
     },
     viewportWidth: 1366,
     viewportHeight: 768,
