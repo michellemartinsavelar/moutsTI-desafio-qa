@@ -1,17 +1,25 @@
 import loginServico from '../../support/servicos/loginServico'
+import produtosServico from '../../support/servicos/produtosServico'
 import { gerarUsuario } from '../../support/fabricas/usuarioFabrica'
+import { gerarProduto } from '../../support/fabricas/produtoFabrica'
 import { validarContrato } from '../../support/contratos/validarContrato'
 import { MENSAGENS } from '../../support/constantes/mensagens'
 import contratoLoginSucesso from '../../fixtures/contratos/loginSucesso.json'
 
 describe('API | Login - POST /login', () => {
   context('com credenciais válidas', () => {
-    it('[API-LOG-01] deve retornar 200 com o token de acesso no contrato esperado', () => {
-      cy.criarUsuarioViaApi().then((usuario) => {
-        loginServico.autenticar(usuario).then((resposta) => {
+    it('[API-LOG-01] deve retornar 200 com um token de acesso aceito em rota protegida', () => {
+      cy.criarUsuarioViaApi({ administrador: 'true' }).then((administrador) => {
+        loginServico.autenticar(administrador).then((resposta) => {
           expect(resposta.status).to.equal(200)
           expect(resposta.body.message).to.equal(MENSAGENS.login.sucesso)
           validarContrato(resposta.body, contratoLoginSucesso)
+
+          // O formato do token não basta: ele precisa ser aceito por uma rota protegida
+          produtosServico
+            .cadastrar(gerarProduto(), resposta.body.authorization)
+            .its('status')
+            .should('equal', 201)
         })
       })
     })
