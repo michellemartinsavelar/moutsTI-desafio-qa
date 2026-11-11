@@ -145,12 +145,13 @@ O projeto não precisa de nenhuma credencial: cada teste cria os próprios usuá
 │   │   └── ui/                     # testes E2E (um arquivo por funcionalidade)
 │   ├── fixtures/
 │   │   └── contratos/              # JSON Schemas das respostas da API
+│   ├── tarefas/                    # código que roda no Node (limpeza da massa)
 │   └── support/
 │       ├── comandos/               # comandos customizados (pré-condições via API e acesso autenticado)
 │       ├── constantes/             # mensagens da aplicação e rotas do front
 │       ├── contratos/              # validador de contrato (Ajv)
 │       ├── fabricas/               # geração de massa de dados (Faker)
-│       ├── massa/                  # registro e limpeza da massa criada
+│       ├── massa/                  # registro da massa criada pelos testes
 │       ├── paginas/                # Page Objects
 │       ├── servicos/               # Service Objects da API
 │       └── e2e.js                  # ponto de entrada do support
@@ -173,9 +174,12 @@ Para incluir uma funcionalidade nova, o caminho é sempre o mesmo: um serviço e
 
 - **Dinâmica e isolada**: todo usuário e produto é gerado pelo Faker, com e-mail baseado em UUID e nome de produto com sufixo aleatório. Nenhum teste depende de dados pré-existentes no ambiente nem de outro teste.
 - **Pré-condições via API**: os testes E2E preparam o cenário pela API (`cy.criarUsuarioViaApi`, `cy.criarProdutoViaApi`), que é mais rápida e estável, e usam a interface só para o que estão validando. O comando `cy.visitarAutenticado` abre o front já logado para não repetir o login pela tela.
-- **Limpeza automática**: tudo o que é criado fica registrado e é excluído em um `afterEach` global, inclusive quando o teste falha. Nos testes E2E, os comandos `cy.observarCadastroDeUsuario` e `cy.observarCadastroDeProduto` interceptam a resposta da API e registram o que a tela criou, mesmo que o teste falhe em seguida. Se uma exclusão falhar, um aviso aparece no terminal e no log do pipeline, sem reprovar o teste.
+- **Registro automático**: todo cadastro que devolve um `_id` é registrado para limpeza no momento da resposta, antes de qualquer assertiva. Isso acontece na camada de serviço (chamadas de API) e nos comandos `cy.observarCadastroDeUsuario` e `cy.observarCadastroDeProduto` (cadastros feitos pela tela). Vale também para cenários negativos: se a aplicação criar algo que deveria recusar, o teste falha e o registro indevido é removido.
+- **Limpeza resiliente**: um `afterEach` global entrega a massa registrada para uma tarefa que roda no Node (`cypress/tarefas/limparMassa.js`). Cada exclusão é tratada separadamente: erro HTTP, timeout ou falha de rede vira um aviso no terminal e no log do pipeline, sem reprovar o teste e sem impedir as demais exclusões. Os produtos são excluídos com uma credencial de administrador criada só para a limpeza, e não com o token do teste.
 
-> **Atenção:** o Cypress empacota o `support` e cada spec separadamente. Se um spec importasse o gerenciador de massa diretamente, usaria outra instância do módulo, e o `afterEach` global não veria o registro. Por isso o registro é exposto como comando (`cy.registrarUsuarioParaLimpeza`) e uma regra do ESLint bloqueia o import direto nos specs.
+> **Atenção:** o Cypress empacota o `support` e cada spec separadamente, então o módulo de massa é carregado mais de uma vez. Por isso o registro fica em um único objeto no escopo global da página de teste, compartilhado por todas as cópias do módulo.
+
+**Limite conhecido:** se a própria tarefa de limpeza não puder ser executada (por exemplo, se o processo do Cypress for encerrado no meio do teste), a massa daquele teste permanece no ambiente.
 
 ## Qualidade de código e commits
 
@@ -214,6 +218,7 @@ A execução diária existe porque o ServeRest é um ambiente público e compart
 | Asserções sobre a requisição nos testes E2E | Além da tela, o `cy.intercept` confirma o status que o front recebeu da API, o que ajuda a diferenciar erro de front de erro de back-end.                                                       |
 | Mensagens e rotas em constantes             | Se um texto mudar na aplicação, a correção é feita em um único lugar.                                                                                                                           |
 | Efeito colateral nos negativos da API       | Além de status e mensagem, os casos de duplicidade e de falta de permissão consultam a API para confirmar que nada foi criado.                                                                  |
+| Limpeza de massa em tarefa Node             | Fora da fila de comandos do Cypress, uma falha em uma exclusão não interrompe as outras nem reprova o teste. O custo é repetir no Node as três chamadas HTTP da limpeza.                        |
 | Asserção por célula na listagem             | Comparar o texto da linha inteira deixaria um valor casar com outro campo (por exemplo, a quantidade 4 dentro do preço 1648).                                                                   |
 | JavaScript com ES Modules                   | Atende ao requisito do desafio e mantém a mesma sintaxe de `import` no Node e no browser.                                                                                                       |
 

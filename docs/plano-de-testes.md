@@ -71,9 +71,10 @@ O ID interno continua valendo mesmo que a ferramenta de gestão mude.
 
 **API-LOG-01 - Login com credenciais válidas**
 
-- **Dado** um usuário cadastrado
+- **Dado** um administrador cadastrado
 - **Quando** envio `POST /login` com e-mail e senha corretos
 - **Então** recebo status 200, a mensagem "Login realizado com sucesso" e um token `Bearer`, no contrato `loginSucesso.json`
+- **E** o token recebido é aceito em uma rota protegida (cadastro de produto responde 201)
 
 **API-LOG-02 - Login com senha incorreta**
 
@@ -235,4 +236,6 @@ O ID interno continua valendo mesmo que a ferramenta de gestão mude.
 
 ## Massa de dados e limpeza
 
-Todos os casos criam a própria massa (usuários e produtos) pela API, com dados gerados pelo Faker, e removem tudo ao final, mesmo em caso de falha. Os cadastros feitos pela interface são registrados para limpeza pela resposta interceptada. Se uma exclusão falhar, um aviso aparece no terminal. Nenhum caso depende de dados pré-existentes nem da ordem de execução.
+Todos os casos criam a própria massa (usuários e produtos), com dados gerados pelo Faker. Nenhum caso depende de dados pré-existentes nem da ordem de execução.
+
+Todo cadastro que devolve um `_id` é registrado para limpeza no momento da resposta, antes das assertivas, em cenários positivos e negativos. Ao final de cada teste, uma tarefa no Node exclui o que foi registrado e trata cada exclusão separadamente: o que não puder ser removido aparece como aviso no terminal, sem reprovar o teste.
