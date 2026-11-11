@@ -6,8 +6,8 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    # todo dia às 06h de Brasília, para pegar mudanças no ambiente público
-    - cron: '0 9 * * *'
+    # toda segunda às 06h de Brasília, para pegar mudanças no ambiente público
+    - cron: '0 9 * * 1'
   workflow_dispatch:
 
 # o pipeline só precisa ler o repositório
