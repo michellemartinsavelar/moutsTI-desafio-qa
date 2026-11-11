@@ -6,6 +6,7 @@ import { MENSAGENS } from '../../support/constantes/mensagens'
 
 describe('E2E | Login', () => {
   beforeEach(() => {
+    cy.intercept('POST', `${Cypress.expose('apiUrl')}/login`).as('login')
     loginPagina.visitar()
   })
 
@@ -14,6 +15,7 @@ describe('E2E | Login', () => {
       cy.criarUsuarioViaApi({ administrador: 'true' }).then((administrador) => {
         loginPagina.realizarLogin(administrador)
 
+        cy.wait('@login').its('response.statusCode').should('equal', 200)
         cy.location('pathname').should('equal', ROTAS.homeAdministrador)
         // o front coloca dois espaços depois de "Bem Vindo", por isso valido em duas partes
         homePagina
@@ -28,6 +30,7 @@ describe('E2E | Login', () => {
       cy.criarUsuarioViaApi({ administrador: 'false' }).then((usuarioComum) => {
         loginPagina.realizarLogin(usuarioComum)
 
+        cy.wait('@login').its('response.statusCode').should('equal', 200)
         cy.location('pathname').should('equal', ROTAS.home)
         homePagina.titulo().should('contain.text', 'Serverest Store')
         homePagina.botaoLogout().should('be.visible')
@@ -40,6 +43,7 @@ describe('E2E | Login', () => {
       cy.criarUsuarioViaApi().then((usuario) => {
         loginPagina.realizarLogin({ email: usuario.email, password: 'senhaIncorreta' })
 
+        cy.wait('@login').its('response.statusCode').should('equal', 401)
         alerta.comTexto(MENSAGENS.login.credenciaisInvalidas).should('be.visible')
         cy.location('pathname').should('equal', ROTAS.login)
       })
