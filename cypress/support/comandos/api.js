@@ -34,7 +34,7 @@ Cypress.Commands.add('criarProdutoViaApi', (token, sobrescritas = {}) => {
 
   return produtosServico.cadastrar(produto, token).then((resposta) => {
     expect(resposta.status, 'pré-condição: cadastrar produto').to.eq(201)
-    registrarProduto(resposta.body._id, token)
+    registrarProduto(resposta.body._id)
 
     return { ...produto, _id: resposta.body._id }
   })
@@ -50,6 +50,6 @@ Cypress.Commands.add('registrarUsuarioParaLimpeza', (id) => {
   registrarUsuario(id)
 })
 
-Cypress.Commands.add('registrarProdutoParaLimpeza', (id, token) => {
-  registrarProduto(id, token)
+Cypress.Commands.add('registrarProdutoParaLimpeza', (id) => {
+  registrarProduto(id)
 })

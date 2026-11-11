@@ -1,5 +1,6 @@
 import { defineConfig } from 'cypress'
 import registrarRelatorio from 'cypress-mochawesome-reporter/plugin.js'
+import { limparMassa } from './cypress/tarefas/limparMassa.js'
 
 export default defineConfig({
   reporter: 'cypress-mochawesome-reporter',
@@ -18,14 +19,7 @@ export default defineConfig({
     setupNodeEvents(on) {
       registrarRelatorio(on)
 
-      on('task', {
-        // Exibe no terminal avisos que não devem reprovar o teste (ex.: falha na limpeza de massa)
-        avisar(mensagem) {
-          process.stderr.write(`[AVISO] ${mensagem}\n`)
-
-          return null
-        },
-      })
+      on('task', { limparMassa })
     },
     viewportWidth: 1366,
     viewportHeight: 768,

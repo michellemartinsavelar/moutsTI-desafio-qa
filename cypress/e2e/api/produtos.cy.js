@@ -26,7 +26,7 @@ describe('API | Cadastro de produto - POST /produtos', () => {
           expect(resposta.status).to.equal(201)
           expect(resposta.body.message).to.equal(MENSAGENS.cadastro.sucesso)
           validarContrato(resposta.body, contratoCadastroSucesso)
-          cy.registrarProdutoParaLimpeza(resposta.body._id, tokenAdministrador)
+          cy.registrarProdutoParaLimpeza(resposta.body._id)
 
           return produtosServico.buscarPorId(resposta.body._id)
         })

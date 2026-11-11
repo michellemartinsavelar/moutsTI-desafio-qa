@@ -35,7 +35,7 @@ Cypress.Commands.add('observarCadastroDeProduto', (alias) => {
   cy.intercept('POST', `${Cypress.expose('apiUrl')}/produtos`, (requisicao) => {
     requisicao.continue((resposta) => {
       if (resposta.body?._id) {
-        registrarProduto(resposta.body._id, requisicao.headers.authorization)
+        registrarProduto(resposta.body._id)
       }
     })
   }).as(alias)
