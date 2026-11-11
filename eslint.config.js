@@ -46,23 +46,5 @@ export default defineConfig([
     },
   },
 
-  {
-    files: ['cypress/e2e/**/*.js'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['**/massa/gerenciadorDeMassa'],
-              message:
-                'Nos specs, use cy.registrarUsuarioParaLimpeza / cy.registrarProdutoParaLimpeza.',
-            },
-          ],
-        },
-      ],
-    },
-  },
-
   prettier,
 ])

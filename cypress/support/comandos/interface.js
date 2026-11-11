@@ -24,9 +24,7 @@ Cypress.Commands.add('visitarAutenticado', (rota, { usuario, token }) => {
 Cypress.Commands.add('observarCadastroDeUsuario', (alias) => {
   cy.intercept('POST', `${Cypress.expose('apiUrl')}/usuarios`, (requisicao) => {
     requisicao.continue((resposta) => {
-      if (resposta.body?._id) {
-        registrarUsuario(resposta.body._id)
-      }
+      registrarUsuario(resposta.body?._id)
     })
   }).as(alias)
 })
@@ -34,9 +32,7 @@ Cypress.Commands.add('observarCadastroDeUsuario', (alias) => {
 Cypress.Commands.add('observarCadastroDeProduto', (alias) => {
   cy.intercept('POST', `${Cypress.expose('apiUrl')}/produtos`, (requisicao) => {
     requisicao.continue((resposta) => {
-      if (resposta.body?._id) {
-        registrarProduto(resposta.body._id)
-      }
+      registrarProduto(resposta.body?._id)
     })
   }).as(alias)
 })

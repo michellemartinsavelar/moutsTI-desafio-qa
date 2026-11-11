@@ -16,7 +16,6 @@ describe('API | Cadastro de usuário - POST /usuarios', () => {
           expect(resposta.status).to.equal(201)
           expect(resposta.body.message).to.equal(MENSAGENS.cadastro.sucesso)
           validarContrato(resposta.body, contratoCadastroSucesso)
-          cy.registrarUsuarioParaLimpeza(resposta.body._id)
 
           return usuariosServico.buscarPorId(resposta.body._id)
         })
