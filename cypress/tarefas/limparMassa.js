@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { MENSAGENS } from '../support/constantes/mensagens.js'
+import { avisar } from './avisos.js'
 
 // Limpeza da massa, rodando no Node (cy.task) e não na fila de comandos do Cypress.
 // Assim cada exclusão é tratada sozinha: se uma falhar ou der timeout, vira um
@@ -97,9 +98,8 @@ export async function limparMassa({ apiUrl, usuarios, produtos }) {
   pendencias.push(...resultados)
 
   const pendenciasReais = pendencias.filter(Boolean)
-  pendenciasReais.forEach((pendencia) => {
-    process.stderr.write(`[AVISO] Limpeza de massa: ${pendencia}\n`)
-  })
+
+  avisar('LIMPEZA', 'Massa de teste não removida', pendenciasReais)
 
   return pendenciasReais
 }
