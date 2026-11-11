@@ -2,6 +2,9 @@ export const MENSAGENS = {
   login: {
     sucesso: 'Login realizado com sucesso',
     credenciaisInvalidas: 'Email e/ou senha inválidos',
+    // textos como a tela exibe: o front põe a primeira letra em maiúscula
+    emailObrigatorioNaTela: 'Email é obrigatório',
+    senhaObrigatoriaNaTela: 'Password é obrigatório',
   },
   cadastro: {
     sucesso: 'Cadastro realizado com sucesso',

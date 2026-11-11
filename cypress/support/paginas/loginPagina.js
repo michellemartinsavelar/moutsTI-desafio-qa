@@ -14,6 +14,10 @@ class LoginPagina {
   realizarLogin({ email, password }) {
     cy.get(this.seletores.email).type(email)
     cy.get(this.seletores.senha).type(password, { log: false })
+    this.entrar()
+  }
+
+  entrar() {
     cy.get(this.seletores.botaoEntrar).click()
   }
 }

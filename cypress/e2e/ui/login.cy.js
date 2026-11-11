@@ -49,4 +49,15 @@ describe('E2E | Login', () => {
       })
     })
   })
+
+  context('com campos obrigatórios não preenchidos', () => {
+    it('[E2E-LOG-04] deve exibir um alerta para cada campo e permanecer na tela de login', () => {
+      loginPagina.entrar()
+
+      cy.wait('@login').its('response.statusCode').should('equal', 400)
+      alerta.comTexto(MENSAGENS.login.emailObrigatorioNaTela).should('be.visible')
+      alerta.comTexto(MENSAGENS.login.senhaObrigatoriaNaTela).should('be.visible')
+      cy.location('pathname').should('equal', ROTAS.login)
+    })
+  })
 })
