@@ -285,4 +285,4 @@ O ID interno continua valendo mesmo que a ferramenta de gestão mude.
 
 Todos os casos criam a própria massa (usuários e produtos), com dados gerados pelo Faker. Nenhum caso depende de dados pré-existentes nem da ordem de execução.
 
-Todo cadastro que devolve um `_id` é registrado para limpeza no momento da resposta, antes das assertivas, em cenários positivos e negativos. Ao final de cada teste, uma tarefa no Node exclui o que foi registrado e trata cada exclusão separadamente: o que não puder ser removido aparece como aviso no terminal, sem reprovar o teste.
+Todo cadastro que devolve um `_id` é registrado para limpeza no momento da resposta, antes das assertivas, em cenários positivos e negativos. Ao final de cada teste, uma tarefa no Node exclui o que foi registrado e trata cada exclusão separadamente: o que não puder ser removido aparece como aviso no terminal e no resumo do pipeline, sem reprovar o teste.
