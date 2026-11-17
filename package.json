@@ -26,17 +26,17 @@
     "@eslint/js": "^10.0.1",
     "@faker-js/faker": "^10.6.0",
     "ajv": "^8.20.0",
-    "cypress": "^16.2.1",
+    "cypress": "^16.3.0",
     "cypress-mochawesome-reporter": "^5.0.0",
-    "eslint": "^10.14.0",
+    "eslint": "^10.15.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-cypress": "^7.0.4",
+    "eslint-plugin-cypress": "^7.0.5",
     "eslint-plugin-mocha": "^12.0.2",
     "globals": "^17.14.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
     "mocha": "^12.0.3",
-    "prettier": "^3.9.10"
+    "prettier": "^3.10.1"
   },
   "overrides": {
     "minimatch": "^11.0.5",
